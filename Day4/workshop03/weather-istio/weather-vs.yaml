@@ -1,0 +1,43 @@
+apiVersion: networking.istio.io/v1alpha3
+
+kind: VirtualService
+
+metadata:
+  name: weatherapp-vs
+
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - weatherapp-gateway
+
+  http:
+  - match:
+    - uri:
+        exact: /
+    route:
+    - destination:
+        host: weatherappsvc
+        port:
+          number: 8080
+    rewrite:
+      uri: /
+  - match:
+    - uri:
+        exact: /weather
+    route:
+    - destination:
+        host: weatherappsvc
+        subset: leastconn
+        port:
+          number: 8080
+    rewrite:
+      uri: /    
+  - match:
+    - uri:
+        prefix: /weather
+    route:
+    - destination:
+        host: weatherappsvc
+        port:
+          number: 8080
